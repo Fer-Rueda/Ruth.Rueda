@@ -13,8 +13,14 @@ int main()
 
     if( loginUsuario() )
     {
-        cout << "Bienvenido al juego del lobillo"<< rrExtraerNombre(rrUsuario);
-         
+
+        rrSetTextColor(textColorBlue);
+        while (menu())
+        {
+            cout <<"\t\tEsta cruzando:"<< actorCruza << endl;
+            navegar();
+        }
+            
     }
 
     return 0;

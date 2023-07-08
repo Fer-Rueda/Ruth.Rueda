@@ -1,5 +1,5 @@
 /**
- * @author : Ruth.Rueda
+ * @author : Fer-Rueda
  * libreria de utilitarios
  **/
 
@@ -18,6 +18,7 @@ using namespace std;
 //const string WHITESPACE = " \n\r\t\f\v";
 const string WHITESPACE = " ";
 #define SLEEP 50000
+#define DELAY 100000
 
 const string CEDULA = "1003781018";
 const string NOMBRE = "Ruth Fernanda Rueda Rueda";
@@ -25,7 +26,13 @@ const string CORREO = "ruth.rueda@epn.edu.ec";
 
 string rrUsuario = "";
 
-enum rrMenuOpc {SOLO = 0, LOBO, CAPERUCITA, UVAS, SALIR};
+enum actor{obse=0,lobo,cape,uvas};
+
+bool obseEstaIzq = true;
+int opcionmenu = -1,anchoRio=15;
+string arrIzq[] ={"obse","lobo","cape","uvas"},
+       arrDer[] ={"","","",""},
+       actorCruza= "";
 
 /**
  * rrMayusculasCadena: retorna una cadena en mayusculas
@@ -60,7 +67,7 @@ void rrMostrarDatos()
     cout << "\t\t -  Cedula: "<< CEDULA << endl;
     cout << "\t\t -  Correo: "<< rrMinusculasCadena(CORREO) << endl;
     cout << "\t\t -  Nombre: "<< rrMayusculasCadena(NOMBRE) << endl;
-    cout << "\t\t -  Fecha : 27/06/2023"<< endl;
+    cout << "\t\t -  Fecha : 07/07/2023"<< endl;
     
 }
 
@@ -127,7 +134,7 @@ int rrGetNumeroIntervalo(string label, int liminf, int limsup)
 }
 
 /**
- * getContrasena : Reemplaza cada caracter con un * 
+ * rrGetContrasena : Reemplaza cada caracter con un * 
  * @param label : Nombre de la etiqueta
 */
 string getContrasena(string label)
@@ -148,7 +155,7 @@ string getContrasena(string label)
 }
 
 /**
- * getCadenaSinEspaciosSimple : Obtiene una cadena de caracteres 
+ * rrGetCadenaSinEspaciosSimple : Obtiene una cadena de caracteres 
  * @param label : Nombre de la etiqueta
 */
 
@@ -165,16 +172,15 @@ string rrGetCadenaSinEspaciosSimple(string label)
     return str;
 }
 
-
-int rrMenu ()
+/**
+ * getCadenaSinEspaciosSimple : Obtiene una cadena de caracteres 
+ * @param label : Nombre de la etiqueta
+*/
+string rrExtraerNombre(string rrStr)
 {
-    cout<< "\t\t" << SOLO <<  " Solo" <<endl;
-    cout<< "\t\t" << LOBO <<  " Lobo" <<endl;
-    cout<< "\t\t" << CAPERUCITA <<  " Caperucita" <<endl;
-    cout<< "\t\t" << UVAS <<  " Uvas" <<endl;
-    cout<< "\t\t" << SALIR <<  " Salir" <<endl;
-    return rrGetNumeroIntervalo("\t\t>> Ingresa Opcion: ", 0 , 4); 
-
+    int pos = rrStr.find('@');
+    string rrUsername = rrStr.substr(0, pos);
+    return rrUsername;
 }
 
 bool loginUsuario()
@@ -193,8 +199,8 @@ bool loginUsuario()
         {
             if(user+pass == up)
             {
-                rrUsuario = rrMayusculasCadena(user);
-                cout << endl << endl << "\t\t:: Bienvenido " << rrUsuario << endl <<endl;
+                rrUsuario = rrExtraerNombre(rrMayusculasCadena(user));
+                cout << endl << endl << "\t\t:: Bienvenid@ " << rrUsuario << " al juego del lobito" <<endl <<endl;
                 return true;
             }
         }
@@ -206,28 +212,113 @@ bool loginUsuario()
     
 }
 
-string rrExtraerNombre(string rrStr)
+string showactor(const string arr[])
 {
-    //string rrNombre;
-    int rrPos=0;
-
-    for(long long unsigned int i = 0; i < rrStr.length(); i++)
-    {
-        if(rrStr[i] == '@')
-        {
-            rrPos = i;
-        }
-    }
-
-    string rrNombre = rrStr.substr(0,rrPos);
-
-    return rrNombre;
-
+    string personaje="";
+    for (int i = 0; i < 4; i++)
+        personaje+=arr[i]+", ";
+    return personaje;
 }
 
-
-
-void rrBarca()
+string showrio(int lenRio)
 {
-    string rrNombre = rrExtraerNombre(rrUsuario);
+    string rio="";
+    for (int i = 0; i < lenRio-1; i++)
+    {
+        rio+=" - ";
+    }
+    return rio;
+}
+
+bool menu()
+{
+    cout<<"\n\t\t0.Solo\n\t\t1.Lobo\n\t\t2.Caperucita\n\t\t3.Uvas\n\t\t4.Salir";
+   do
+   {
+        try
+        {
+            string str="";
+            cout<<"\n\t\t>Cruzar: ";
+            cin>>str;
+            opcionmenu= stoi(str);
+            actorCruza= (obseEstaIzq) ? arrIzq[opcionmenu]:arrDer[opcionmenu];
+            if(opcionmenu==4) exit(0);
+            
+            if (actorCruza.empty())
+            {
+                throw invalid_argument("No hay personaje");
+            }
+            
+        }
+        catch(...)
+        {
+            actorCruza="";
+            opcionmenu=-1;
+            cout << "Lo siento, opcion no valida :(" << endl;//tambien funciona con cout
+        }
+        
+   } while (opcionmenu<0);
+   //try catch es un controlador de eventualidades, obliga al programa a cerrarse si no se cumple pero con la cpacidad de recuperar
+    return true;
+}
+
+void validarReglas()
+{
+    string msg ="";
+     bool todosCruzan=(!arrDer[obse].empty() && !arrDer[lobo].empty()
+                      && !arrDer[cape].empty() && !arrDer[uvas].empty());
+     bool lobCap = (obseEstaIzq)
+                 ? (!arrDer[lobo].empty() && !arrDer[cape].empty()) 
+                 : (!arrIzq[lobo].empty() && !arrIzq[cape].empty())  ;
+     bool CapUva = (obseEstaIzq)
+                 ? (!arrDer[cape].empty() && !arrDer[uvas].empty()) 
+                 : (!arrIzq[cape].empty() && !arrIzq[uvas].empty())  ;
+
+     msg+=(lobCap)?"===perdiste===" : "" ;
+     cout << endl;
+     msg+=(CapUva)?"===perdiste===": "" ;
+     cout << endl;
+     msg = (todosCruzan) ? "===GANASTE===" : msg;
+
+     if (!msg.empty())   
+     {
+        cout << "FINAL DEL JUEGO" << endl << msg <<endl;
+        exit(0);
+
+     }              
+
+}
+void navegar()
+{
+    obseEstaIzq=!obseEstaIzq;
+    arrIzq[obse]=arrIzq[opcionmenu]=arrDer[obse]=arrDer[opcionmenu]= "";
+    if(obseEstaIzq)
+     {
+        arrIzq[obse]= "obse";
+        arrIzq[opcionmenu]= actorCruza;
+     }
+     else
+     {
+        arrDer[obse]= "obse";
+        arrDer[opcionmenu]= actorCruza;
+     }
+
+    string barca = "\\_obsee_,_"+actorCruza+"_/",
+           actorIzq=showactor(arrIzq),
+           actorDer=showactor(arrDer);
+
+    if(!obseEstaIzq)
+      for(int pos = 0;pos < anchoRio;pos++)
+        {
+            cout <<"\r"+actorIzq+showrio(pos)+barca+showrio(anchoRio-pos)+actorDer;
+            usleep(DELAY);
+        }
+    else
+        for(int pos = anchoRio;pos >= 0;pos--)
+        {
+            cout <<"\r"+actorIzq+showrio(pos)+barca+showrio(anchoRio-pos)+actorDer;
+            usleep(DELAY);
+        }
+    validarReglas();
+           
 }
