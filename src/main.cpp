@@ -11,14 +11,16 @@ int main()
 
     rrSetTextColor(textColorGreen);
 
-    if( loginUsuario() )
+    if( rrLoginUsuario() )
     {
 
         rrSetTextColor(textColorBlue);
-        while (menu())
+        while (rrMenu())
         {
-            cout <<"\t\tEsta cruzando:"<< actorCruza << endl;
-            navegar();
+
+            cout <<"\t\tEsta cruzando:"<< rrActorCruza << endl <<endl;
+            rrNumViajes++;
+            rrNavegar();
         }
             
     }

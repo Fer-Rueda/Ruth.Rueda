@@ -17,22 +17,23 @@ using namespace std;
 
 //const string WHITESPACE = " \n\r\t\f\v";
 const string WHITESPACE = " ";
-#define SLEEP 50000
 #define DELAY 100000
+
+int rrNumViajes=0;
 
 const string CEDULA = "1003781018";
 const string NOMBRE = "Ruth Fernanda Rueda Rueda";
 const string CORREO = "ruth.rueda@epn.edu.ec";
 
-string rrUsuario = "";
+string rrNombreUsuario = "";
 
 enum actor{obse=0,lobo,cape,uvas};
 
-bool obseEstaIzq = true;
-int opcionmenu = -1,anchoRio=15;
-string arrIzq[] ={"obse","lobo","cape","uvas"},
-       arrDer[] ={"","","",""},
-       actorCruza= "";
+bool rrObseEstaIzq = true;
+int rrOpcionMenu = -1,rrAnchoRio=15;
+string rrArrIzq[] ={"obse","lobo","cape","uvas"},
+       rrArrDer[] ={"","","",""},
+       rrActorCruza= "";
 
 /**
  * rrMayusculasCadena: retorna una cadena en mayusculas
@@ -72,7 +73,7 @@ void rrMostrarDatos()
 }
 
 /**
- * getNumeroPositivo : Obtiene un numero entero positivo
+ * rrGetNumeroPositivo : Obtiene un numero entero positivo
  * @param label : Nombre de la etiqueta
 */
 int getNumeroPositivo(string label) 
@@ -137,7 +138,7 @@ int rrGetNumeroIntervalo(string label, int liminf, int limsup)
  * rrGetContrasena : Reemplaza cada caracter con un * 
  * @param label : Nombre de la etiqueta
 */
-string getContrasena(string label)
+string rrGetContrasena(string label)
 {
     int i=0;
     char con[10] = { 0 };
@@ -178,73 +179,80 @@ string rrGetCadenaSinEspaciosSimple(string label)
 */
 string rrExtraerNombre(string rrStr)
 {
-    int pos = rrStr.find('@');
-    string rrUsername = rrStr.substr(0, pos);
+    int rrPos = rrStr.find('@');
+    string rrUsername = rrStr.substr(0, rrPos);
     return rrUsername;
 }
 
-bool loginUsuario()
+bool rrLoginUsuario()
 {
     int numIntento = 3;
-    vector<string> usuarios = {CORREO+CEDULA, "profe1234"};
+    vector<string> rrUsuarios = {CORREO+CEDULA, "profe1234"};
 
     do
     {
-        cout << endl << "\t\t............................" << endl;
+        cout << endl << "\t\t...................................." << endl;
         string user = rrGetCadenaSinEspaciosSimple("\t\t+ usuario: ");
-        string pass = getContrasena("\t\t+ clave: ");
-        cout << "\t\t............................" << endl;
+        string pass = rrGetContrasena("\t\t+ clave: ");
+        cout << "\t\t...................................." << endl;
         cout<< "\t\t *Nro de intentos: " << --numIntento << endl <<endl;
-        for(auto &&up : usuarios)
+        for(auto &&up : rrUsuarios)
         {
             if(user+pass == up)
             {
-                rrUsuario = rrExtraerNombre(rrMayusculasCadena(user));
-                cout << endl << endl << "\t\t:: Bienvenid@ " << rrUsuario << " al juego del lobito" <<endl <<endl;
+                rrNombreUsuario = rrExtraerNombre(rrMayusculasCadena(user));
+                cout << endl << endl << "\t\t:: Bienvenid@ " << rrNombreUsuario << " al juego del lobito" <<endl <<endl;
                 return true;
             }
         }
          
     } while (numIntento>0);
 
-    cout<< "Usuario y clave incorrectos..." << endl;
+    rrSetTextColor(textColorBlue);
+    cout<< "\t\tUsuario o clave incorrectos..." << endl;
     return false;
     
 }
 
-string showactor(const string arr[])
+string rrShowActor(const string rrArr[])
 {
-    string personaje="";
+    string rrPersonaje="";
     for (int i = 0; i < 4; i++)
-        personaje+=arr[i]+", ";
-    return personaje;
+        rrPersonaje+=rrArr[i]+", ";
+    return rrPersonaje;
 }
 
-string showrio(int lenRio)
+string rrShowRio(int rrLenRio)
 {
-    string rio="";
-    for (int i = 0; i < lenRio-1; i++)
+    string rrRio="";
+    for (int i = 0; i < rrLenRio-1; i++)
     {
-        rio+=" - ";
+        rrRio+=" _ ";
     }
-    return rio;
+    return rrRio;
 }
 
-bool menu()
+bool rrMenu()
 {
     cout<<"\n\t\t0.Solo\n\t\t1.Lobo\n\t\t2.Caperucita\n\t\t3.Uvas\n\t\t4.Salir";
    do
    {
         try
         {
-            string str="";
+            string rrStr="";
             cout<<"\n\t\t>Cruzar: ";
-            cin>>str;
-            opcionmenu= stoi(str);
-            actorCruza= (obseEstaIzq) ? arrIzq[opcionmenu]:arrDer[opcionmenu];
-            if(opcionmenu==4) exit(0);
+            cin>>rrStr;
+            rrOpcionMenu= stoi(rrStr);
+            rrActorCruza= (rrObseEstaIzq) ? rrArrIzq[rrOpcionMenu]:rrArrDer[rrOpcionMenu];
+            if(rrOpcionMenu==4)
+            {
+                rrSetTextColor(textColorGreen);
+                cout<< "\n\t\tNumero de Viajes: " << rrNumViajes <<endl;
+                cout<< "\n\t\tSaliste del juego del lobito, adiós " << rrNombreUsuario <<endl;
+                exit(0);
+            }
             
-            if (actorCruza.empty())
+            if (rrActorCruza.empty())
             {
                 throw invalid_argument("No hay personaje");
             }
@@ -252,73 +260,84 @@ bool menu()
         }
         catch(...)
         {
-            actorCruza="";
-            opcionmenu=-1;
-            cout << "Lo siento, opcion no valida :(" << endl;//tambien funciona con cout
+            rrActorCruza="";
+            rrOpcionMenu=-1;
+            cout << "\n\t\tLo siento, opcion no valida :(" << endl;//tambien funciona con cout
         }
         
-   } while (opcionmenu<0);
+   } while (rrOpcionMenu<0);
    //try catch es un controlador de eventualidades, obliga al programa a cerrarse si no se cumple pero con la cpacidad de recuperar
     return true;
 }
 
-void validarReglas()
+void rrValidarReglas()
 {
-    string msg ="";
-     bool todosCruzan=(!arrDer[obse].empty() && !arrDer[lobo].empty()
-                      && !arrDer[cape].empty() && !arrDer[uvas].empty());
-     bool lobCap = (obseEstaIzq)
-                 ? (!arrDer[lobo].empty() && !arrDer[cape].empty()) 
-                 : (!arrIzq[lobo].empty() && !arrIzq[cape].empty())  ;
-     bool CapUva = (obseEstaIzq)
-                 ? (!arrDer[cape].empty() && !arrDer[uvas].empty()) 
-                 : (!arrIzq[cape].empty() && !arrIzq[uvas].empty())  ;
-
-     msg+=(lobCap)?"===perdiste===" : "" ;
-     cout << endl;
-     msg+=(CapUva)?"===perdiste===": "" ;
-     cout << endl;
-     msg = (todosCruzan) ? "===GANASTE===" : msg;
-
-     if (!msg.empty())   
+    string rrMsg ="";
+     bool rrTodosCruzan=(!rrArrDer[obse].empty() && !rrArrDer[lobo].empty()
+                      && !rrArrDer[cape].empty() && !rrArrDer[uvas].empty());
+     bool rrLobCap = (rrObseEstaIzq)
+                 ? (!rrArrDer[lobo].empty() && !rrArrDer[cape].empty())
+                 : (!rrArrIzq[lobo].empty() && !rrArrIzq[cape].empty())  ;
+     bool rrCapUva = (rrObseEstaIzq)
+                 ? (!rrArrDer[cape].empty() && !rrArrDer[uvas].empty()) 
+                 : (!rrArrIzq[cape].empty() && !rrArrIzq[uvas].empty())  ;
+    
+     if(rrLobCap && rrCapUva)
      {
-        cout << "FINAL DEL JUEGO" << endl << msg <<endl;
+        rrMsg+=(rrLobCap)?"Perdiste!!! Se comieron todos" : "" ;
+        cout << endl;
+     }
+     else
+     {
+        rrMsg+=(rrLobCap)?"Perdiste!!! El Lobito se comio a Caperucita" : "" ;
+        cout << endl;
+        rrMsg+=(rrCapUva)?"Perdiste!!! La Caperucita se comio las Uvas": "" ;
+        cout << endl;
+     }
+
+     rrMsg = (rrTodosCruzan) ? "Ganaste, Felicitaciones!!!" : rrMsg;
+
+     if (!rrMsg.empty())   
+     {
+        rrSetTextColor(textColorGreen);
+        cout << "\t\tFIN DEL JUEGO" << endl <<"\t\t"<< rrMsg <<endl;
+        cout<< "\t\tNumero de Viajes: " << rrNumViajes <<endl;
         exit(0);
 
      }              
 
 }
-void navegar()
+void rrNavegar()
 {
-    obseEstaIzq=!obseEstaIzq;
-    arrIzq[obse]=arrIzq[opcionmenu]=arrDer[obse]=arrDer[opcionmenu]= "";
-    if(obseEstaIzq)
+    rrObseEstaIzq=!rrObseEstaIzq;
+    rrArrIzq[obse]=rrArrIzq[rrOpcionMenu]=rrArrDer[obse]=rrArrDer[rrOpcionMenu]= "";
+    if(rrObseEstaIzq)
      {
-        arrIzq[obse]= "obse";
-        arrIzq[opcionmenu]= actorCruza;
+        rrArrIzq[obse]= "obse";
+        rrArrIzq[rrOpcionMenu]= rrActorCruza;
      }
      else
      {
-        arrDer[obse]= "obse";
-        arrDer[opcionmenu]= actorCruza;
+        rrArrDer[obse]= "obse";
+        rrArrDer[rrOpcionMenu]= rrActorCruza;
      }
 
-    string barca = "\\_obsee_,_"+actorCruza+"_/",
-           actorIzq=showactor(arrIzq),
-           actorDer=showactor(arrDer);
+    string rrBarca = "\\_"+rrNombreUsuario+"_,_"+rrActorCruza+"_/ ",
+           rrActorIzq=rrShowActor(rrArrIzq),
+           rrActorDer=rrShowActor(rrArrDer);
 
-    if(!obseEstaIzq)
-      for(int pos = 0;pos < anchoRio;pos++)
+    if(!rrObseEstaIzq)
+      for(int rrPos = 0;rrPos < rrAnchoRio;rrPos++)
         {
-            cout <<"\r"+actorIzq+showrio(pos)+barca+showrio(anchoRio-pos)+actorDer;
+            cout <<"\r"+rrActorIzq+rrShowRio(rrPos)+rrBarca+rrShowRio(rrAnchoRio-rrPos)+rrActorDer;
             usleep(DELAY);
         }
     else
-        for(int pos = anchoRio;pos >= 0;pos--)
+        for(int rrPos = rrAnchoRio;rrPos >= 0;rrPos--)
         {
-            cout <<"\r"+actorIzq+showrio(pos)+barca+showrio(anchoRio-pos)+actorDer;
+            cout <<"\r"+rrActorIzq+rrShowRio(rrPos)+rrBarca+rrShowRio(rrAnchoRio-rrPos)+rrActorDer;
             usleep(DELAY);
         }
-    validarReglas();
+    rrValidarReglas();
            
 }
